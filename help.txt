@@ -1,0 +1,118 @@
+Student Accounts Format
+-----------------------
+Stored in students.txt:
+
+1. Student ID
+2. Student Name
+3. Current Balance (stored as balanceDeposit)
+   - Loaded from balance.txt and stored in students.txt
+4. Semester Spending Limit
+   - Asked one time during createAccount()
+   - Cannot be changed afterwards
+5. Total Spent This Semester
+   - Calculated by spendMoney()
+6. Optional: Routing Number for Withdrawals
+   - Only needed if the student wants to use withdrawToBank()
+
+SEPARATE FILE:
+balance.txt
+- A separate function/program will repeatedly ask the user to add or subtract money.
+- Input continues until the user types "exit" (case insensitive).
+- The final calculated balance is written to balance.txt.
+- The main program reads this balance and saves it in the student's balanceDeposit field.
+
+FILE LOADING AND SAVING:
+
+loadAccounts("students.txt")
+- Runs FIRST, immediately when the program starts.
+- Opens students.txt and reads every line.
+
+- Converts each line into a StudentAccount struct.
+- Stores all student accounts in an in-memory array.
+    ( Each line of students.txt is read as text (a string).
+    That line is then split into pieces (ID, Name, Balance, etc.).
+    Those pieces are put into a StudentAccount struct, filling its fields.
+    That struct is placed into an array (like students[0], students[1], students[2]).
+    The array holds all student accounts in memory while the program is running.
+    )
+- Required so that createAccount(), loginStudent(), spendMoney(), viewAccount(),
+  and withdrawToBank() can all access existing user data.
+
+saveAccounts("students.txt")
+- Runs LAST, right before the program exits.
+- Opens students.txt for writing.
+- Writes every StudentAccount from memory back into the file.
+- Ensures ALL changes made during the program are permanently saved.
+- If students.txt does NOT exist, this function automatically CREATES it.
+
+FUNCTIONS IN THE PROGRAM:
+
+createAccount()
+- Asks for Student ID, Name, semester spending limit, and routing number (optional).
+- Initializes spentThisSem = 0.
+- Loads balanceDeposit from balance.txt.
+- Adds the new account to the in-memory array.
+- Does NOT write to students.txt directly. Saving is handled later by saveAccounts().
+
+loginStudent()
+- Asks for a Student ID.
+- Searches the array loaded by loadAccounts().
+- Returns the index of the matching student.
+- Used by studentMenu().
+
+spendMoney(int studentIndex)
+- Subtracts from balanceDeposit.
+- Adds to spentThisSem.
+- Checks if the student exceeds semLimit.
+- Updates the in-memory student record.
+
+viewAccount(int studentIndex)
+- Displays:
+  - Student ID
+  - Name
+  - balanceDeposit
+  - semLimit
+  - spentThisSem
+  - remaining limit
+  - routingNumber
+
+withdrawToBank(int studentIndex)
+- Uses routingNumber to simulate a bank withdrawal.
+- If routingNumber is missing, displays an error.
+
+approveClubTransaction()
+- Simulates voting on club fund approval.
+- Requires 2/3 majority.
+- Does not modify students.txt.
+
+studentMenu(int studentIndex)
+- Menu shown after login.
+- Calls:
+  1. viewAccount()
+  2. spendMoney()
+  3. withdrawToBank()
+  4. Logout
+
+mainMenu()
+- First menu in the program.
+- Calls:
+  1. createAccount()
+  2. loginStudent() → studentMenu()
+  3. approveClubTransaction()
+  4. Exit (saveAccounts() is called at the end)
+
+PROGRAM EXECUTION ORDER
+-----------------------
+
+1. Program starts.
+2. loadAccounts("students.txt") runs FIRST
+   - Loads all existing student accounts from students.txt
+   - If the file does not exist, the program will later create it.
+
+3. mainMenu() runs
+   - User may choose:
+     - createAccount()
+     - loginStudent()
+     - approveClubTransaction()
+     - exit program
+(use a switch case to get these to run)
